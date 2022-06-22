@@ -50,10 +50,11 @@ cprl
       if(err) {
         return console.log(err);
       }
-      let table = new Table({
-        head:[chalk.white.bold('Latitude'),chalk.white.bold('Longitude')]
-      });
-      table.push([chalk.yellow.bold(`${args.latitude}`) , chalk.yellow.bold(`${args.longitude}`)]);
+      // let table = new Table({
+      //   head:[chalk.white.bold('Latitude'),chalk.white.bold('Longitude')]
+      // });
+      let table = new Table()
+      table.push([chalk.yellow.bold(`Successfully set coordinates to ${args.latitude} , ${args.longitude}`)]);
       console.log(table.toString());
     });
   }
