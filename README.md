@@ -17,12 +17,14 @@
  ```sh
  npm install -g .
  ```
+- Navigate out of the wnow-cli directory
 
 # Usage
 - Set Latitude and Longitude
 ```sh
 wnow set <latitude> <longitude>
 ```
+
 - Check the weather
 ```sh
 wnow
