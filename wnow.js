@@ -5,9 +5,10 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const chalk = require('chalk');
 const Table = require('cli-table');
+const {isValidCoords} = require('./utils');
 
 
-const prgVersion = 0.1;
+const prgVersion = 0.2;
 cprl.version(prgVersion);
 
 const weatherCodes={
@@ -38,19 +39,7 @@ const weatherCodes={
 
 const fetchCurrWeather = (lat,long) =>{
   let url = `https://api.open-meteo.com/v1/forecast?latitude=${parseFloat(lat)}&longitude=${parseFloat(long)}&current_weather=true`;
-  fetch(url)
-  .then((res)=>res.json())
-  .then((data)=>{
-    let table = new Table({
-      head:[chalk.white.bold('Temperature'),chalk.white.bold('Wind Speed'),chalk.white.bold('Wind Direction'),chalk.white.bold('Weather')]
-    });
-    let wcode = weatherCodes[data.current_weather.weathercode];
-    table.push(
-      [chalk.yellow.bold(`${data.current_weather.temperature}°C`),chalk.yellow.bold(`${data.current_weather.windspeed} km/h`),chalk.yellow.bold(`${data.current_weather.winddirection}°`) ,chalk.yellow.bold(`${wcode}`)]
-    );
-    console.log("");
-    console.log(chalk.bold(table.toString()));
-  });
+  return fetch(url).then((res)=>res.json());
 }
 
 cprl
@@ -66,7 +55,18 @@ cprl
     }
     str = str.concat(data);
     coords = str.split(' ');
-    fetchCurrWeather(coords[0],coords[1]);
+
+    fetchCurrWeather(coords[0],coords[1]).then(apiData=>{
+      let table = new Table({
+          head:[chalk.white.bold('Temperature'),chalk.white.bold('Wind Speed'),chalk.white.bold('Wind Direction'),chalk.white.bold('Weather')]
+        });
+        let wcode = weatherCodes[apiData.current_weather.weathercode];
+        table.push(
+            [chalk.yellow.bold(`${apiData.current_weather.temperature}°C`),chalk.yellow.bold(`${apiData.current_weather.windspeed} km/h`),chalk.yellow.bold(`${apiData.current_weather.winddirection}°`) ,chalk.yellow.bold(`${wcode}`)]
+          );
+          console.log("");
+          console.log(chalk.bold(table.toString()));
+    });
   });
 
 });
@@ -77,18 +77,25 @@ cprl
 .argument('<longitude>' ,'Specify Longitude')
 .action((args,options)=>{
 
-  let content = `${args.latitude} ${args.longitude}`
-
-  fs.writeFile("./coords", content, function(err) {
+  if (isValidCoords(args.latitude , args.longitude)){
+    let content = `${args.latitude} ${args.longitude}`;
+    fs.writeFile("./coords", content, function(err) {
       if(err) {
-          return console.log(err);
+        return console.log(err);
       }
       let table = new Table({
         head:[chalk.white.bold('Latitude'),chalk.white.bold('Longitude')]
       });
       table.push([chalk.yellow.bold(`${args.latitude}`) , chalk.yellow.bold(`${args.longitude}`)]);
       console.log(table.toString());
-  });
+    });
+  }
+  else{
+    let table = new Table();
+    table.push([chalk.red.bold('Bad values , please give numeric values greater than one!')]);
+    console.log(table.toString());
+    return;
+  }
 
 });
 
@@ -102,3 +109,5 @@ cprl
 })
 
 cprl.parse(process.argv);
+
+module.exports = {isValidCoords};
