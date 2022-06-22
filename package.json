@@ -1,0 +1,20 @@
+{
+  "name": "wnow",
+  "version": "1.0.0",
+  "description": "cli app that fetches the current weather from the open-meteo weather API",
+  "main": "wnow.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "harvygr8",
+  "license": "ISC",
+  "dependencies": {
+    "caporal": "^1.4.0",
+    "chalk": "^4.1.2",
+    "cli-table": "^0.3.11",
+    "node-fetch": "^2.6.7"
+  },
+  "bin": {
+    "wnow": "./wnow.js"
+  }
+}
