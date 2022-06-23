@@ -33,7 +33,7 @@ cprl
              chalk.yellow.bold(`${apiData.wind.speed} m/s`),chalk.yellow.bold(`${apiData.wind.deg}°`)]
           );
         console.log("");
-        console.log(chalk.yellow.bold(figlet.textSync(`WNOW v ${prgVersion}`,{ font: 'Small'})));
+        console.log(chalk.yellow.bold(figlet.textSync(`WNOW v ${prgVersion}`,{ font: 'ANSI Shadow'})));
         console.log(chalk.bold(table.toString()));
     })
     .catch(err=>{

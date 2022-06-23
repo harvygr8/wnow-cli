@@ -1,7 +1,7 @@
 # wnow-cli
  CLI application to check the current weather in the terminal.
 
- ![](img/show1.png)
+ ![](img/show.png)
 
 # About
   wnow is a command line program that gives you weather information for any given location using the [Open Weather Map API](https://openweathermap.org/api).
