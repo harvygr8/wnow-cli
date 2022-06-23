@@ -1,3 +1,4 @@
+//deprecated
 const { isValidCoords } = require('../utils');
 
 

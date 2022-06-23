@@ -1,79 +1,65 @@
 #!/usr/bin/env node
 
 const cprl = require('caporal');
+const Table = require('cli-table');
+const figlet = require('figlet');
+const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk');
-const Table = require('cli-table');
-const {weatherCodes , fetchCurrWeather , isValidCoords} = require('./utils');
+const {fetchCurrWeather} = require('./utils');
 
-const prgVersion = 0.3;
+const prgVersion = 0.4;
 cprl.version(prgVersion);
 
 
 cprl
+.argument('<location>','Specify location name')
 .action((args,options)=>{
   let str=""
   let coords = [];
-  fs.readFile(path.join(__dirname,'/','coords'), 'utf8', function(err, data){
+  fs.readFile(path.join(__dirname,'/','apikey'), 'utf8', function(err, data){
     if(err){
-      let table = new Table();
-      table.push([chalk.red.bold(`No co-ordinates found! , use `) + chalk.red.bold("'wnow set <latitude> <longitude>'")]);
-      console.log(table.toString());
+      console.log(chalk.red.bold(`No API key found! , use 'wnow set <key>'`));
       return;
     }
-    str = str.concat(data);
-    coords = str.split(' ');
-    fetchCurrWeather(coords[0],coords[1]).then(apiData=>{
+    fetchCurrWeather(data,args.location)
+    .then(apiData=>{
       let table = new Table({
-          head:[chalk.white.bold('Temperature'),chalk.white.bold('Wind Speed'),chalk.white.bold('Wind Direction'),chalk.white.bold('Weather')]
+          head:[chalk.white.bold('Temperature'),chalk.white.bold('Weather'),chalk.white.bold('Humidity'),chalk.white.bold('Visibility'),
+          chalk.white.bold('Wind Speed'),chalk.white.bold('Wind Direction')]
         });
-        //add wcode check
-        let wcode = weatherCodes[apiData.current_weather.weathercode];
         table.push(
-            [chalk.yellow.bold(`${apiData.current_weather.temperature}°C`),chalk.yellow.bold(`${apiData.current_weather.windspeed} km/h`),chalk.yellow.bold(`${apiData.current_weather.winddirection}°`) ,chalk.yellow.bold(`${wcode}`)]
+            [chalk.yellow.bold(`${apiData.main.temp}°C`),chalk.yellow.bold(`${apiData.weather[0].main}`),chalk.yellow.bold(`${apiData.main.humidity} %`),chalk.yellow.bold(`${apiData.visibility} m`),
+             chalk.yellow.bold(`${apiData.wind.speed} m/s`),chalk.yellow.bold(`${apiData.wind.deg}°`)]
           );
+        console.log("");
+        console.log(chalk.yellow.bold(figlet.textSync(`WNOW v ${prgVersion}`,{ font: 'Small'})));
         console.log(chalk.bold(table.toString()));
-    });
+    })
+    .catch(err=>{
+      console.log(chalk.red.bold(`Error: ${err.message}`));
+    })
   });
 });
 
 cprl
-.command('set','Set Latitude and Longitude')
-.argument('<latitude>' ,'Specify Latitude')
-.argument('<longitude>' ,'Specify Longitude')
+.command('set','Set your OpenWeatherMap API key')
+.argument('<key>' ,'Specify API key')
 .action((args,options)=>{
 
-  if (isValidCoords(args.latitude , args.longitude)){
-    let content = `${args.latitude} ${args.longitude}`;
-    fs.writeFile((path.join(__dirname,'/','coords')), content, function(err) {
-      if(err) {
-        return console.log(err);
-      }
-      // let table = new Table({
-      //   head:[chalk.white.bold('Latitude'),chalk.white.bold('Longitude')]
-      // });
-      let table = new Table()
-      table.push([chalk.yellow.bold(`Successfully set coordinates to ${args.latitude} , ${args.longitude}`)]);
-      console.log(table.toString());
+  let content = `${args.key}`;
+  fs.writeFile((path.join(__dirname,'/','apikey')), content, function(err) {
+    if(err) {
+      return;
+    }
     });
-  }
-  else{
-    let table = new Table();
-    table.push([chalk.red.bold('Bad values , please give numeric values greater than one!')]);
-    console.log(table.toString());
-    return;
-  }
-
 });
 
 
 cprl
 .command('credits','Show credits and Attributions')
 .action(()=>{
-  let table = new Table();
-  table.push([chalk.yellow.bold(`wnow v${prgVersion} by harvygr8 , `) + chalk.yellow.bold(`weather data fetched using the open-meteo API`)]);
-  console.log(table.toString());
+  console.log(chalk.yellow.bold(`WNOW v${prgVersion} by harvygr8`))
 })
 
 cprl.parse(process.argv);
