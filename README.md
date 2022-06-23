@@ -1,10 +1,10 @@
 # wnow-cli
  CLI application to check the current weather in the terminal.
 
- ![](img/show1.gif)
+ ![](img/show1.png)
 
 # About
-  wnow is a command line program that gives you weather information for any given co-ordinates using the [Open-Meteo API](https://open-meteo.com/en).
+  wnow is a command line program that gives you weather information for any given location using the [Open Weather Map API](https://openweathermap.org/api).
 
 
 # Installation
@@ -20,15 +20,15 @@
 - Navigate out of the wnow-cli directory
 
 # Usage
-- Set Latitude and Longitude
+- Set your api key
 ```sh
-wnow set <latitude> <longitude>
+wnow set <key>
 ```
 
 - Check the weather
 ```sh
-wnow
+wnow <location>
 ```
 
 # Note
-The folks at open-meteo have a very generous 10,000 request limit per day , please keep that in mind when using the application.
+Please make sure to register on the Open Weather Map website and get an API key before using this application.
