@@ -63,5 +63,3 @@ cprl
 })
 
 cprl.parse(process.argv);
-
-module.exports = {isValidCoords};
